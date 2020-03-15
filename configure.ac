@@ -91,11 +91,9 @@ AC_SEARCH_LIBS([av_d2q], [avutil], [], [AC_MSG_ERROR([Cannot find the libavutil 
 
 AC_SEARCH_LIBS([pcre_compile], [pcre], [], [AC_MSG_ERROR([Cannot find the pcre library.])])
 
-AC_SEARCH_LIBS([vc_tv_unregister_callback], [bcm_host], [], [AC_MSG_ERROR([Cannot find the bcm_host library.])])
-
 AC_SEARCH_LIBS([FT_Stroker_New], [freetype], [], [AC_MSG_ERROR([Cannot find the freetype library.])])
 
-LIBS="$LIBS -lEGL"
+LIBS="$LIBS -lEGL -lbcm_host -lvchostif -lvchiq_arm"
 
 CXXFLAGS="$CXXFLAGS -Ilinux"
 CXXFLAGS="$CXXFLAGS -fomit-frame-pointer -mabi=aapcs-linux -g -pthread"
