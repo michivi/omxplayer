@@ -19,6 +19,7 @@ autom4te.cache
 *.o
 help.h
 keys.h
+Makefile
 patch.flag
 version.h
 

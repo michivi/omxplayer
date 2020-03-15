@@ -98,7 +98,7 @@ AC_SEARCH_LIBS([FT_Stroker_New], [freetype], [], [AC_MSG_ERROR([Cannot find the 
 LIBS="$LIBS -lEGL"
 
 CXXFLAGS="$CXXFLAGS -Ilinux"
-CXXFLAGS="$CXXFLAGS -pipe -mfloat-abi=hard -mcpu=arm1176jzf-s -fomit-frame-pointer -mabi=aapcs-linux -mtune=arm1176jzf-s -mfpu=vfp -Wno-psabi -g -pthread"
+CXXFLAGS="$CXXFLAGS -fomit-frame-pointer -mabi=aapcs-linux -g -pthread"
 CXXFLAGS="$CXXFLAGS -DTARGET_POSIX -DTARGET_LINUX -DTARGET_RASPBERRY_PI"
 
 CXXFLAGS="$CXXFLAGS -DUSE_EXTERNAL_FFMPEG"
