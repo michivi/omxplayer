@@ -1,0 +1,9 @@
+#ifndef __VERSION_H__
+#define __VERSION_H__
+
+#define VERSION_DATE "@VERSION_DATE@"
+#define VERSION_HASH "@VERSION_HASH@"
+#define VERSION_BRANCH "@VERSION_BRANCH@"
+#define VERSION_REPO "@VERSION_REPO@"
+
+#endif
