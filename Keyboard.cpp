@@ -6,7 +6,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#if defined(HAVE_DBUS)
 #include <dbus/dbus.h>
+#endif
 #include <errno.h>
 
 #include "utils/log.h"
@@ -35,6 +37,7 @@ Keyboard::Keyboard()
     fcntl(STDIN_FILENO, F_SETFL, orig_fl | O_NONBLOCK);
   }
 
+#if defined(HAVE_DBUS)
   if (dbus_connect() < 0)
   {
     CLog::Log(LOGWARNING, "Keyboard: DBus connection failed");
@@ -45,6 +48,8 @@ Keyboard::Keyboard()
   }
 
   dbus_threads_init_default();
+#endif
+
   Create();
   m_action = -1;
 }
@@ -60,7 +65,9 @@ void Keyboard::Close()
   {
     StopThread();
   }
+#if defined(HAVE_DBUS)
   dbus_disconnect();
+#endif
   restore_term();
 }
 
@@ -90,8 +97,10 @@ void Keyboard::Process()
 {
   while(!m_bStop)
   {
+#if defined(HAVE_DBUS)
     if (conn)
       dbus_connection_read_write_dispatch(conn, 0);
+#endif
     int ch[8];
     int chnum = 0;
 
@@ -118,9 +127,14 @@ int Keyboard::getEvent()
 
 void Keyboard::send_action(int action) 
 {
+#if defined(HAVE_DBUS)
   DBusMessage *message = NULL, *reply = NULL;
   DBusError error;
+#endif
+
   m_action = action;
+
+#if defined(HAVE_DBUS)
   if (!conn)
     return;
 
@@ -159,6 +173,7 @@ fail:
 
   if (reply)
     dbus_message_unref(reply);
+#endif
 }
 
 void Keyboard::setKeymap(std::map<int,int> keymap) 
@@ -170,6 +185,8 @@ void Keyboard::setDbusName(std::string dbus_name)
 {
   m_dbus_name = dbus_name;
 }
+
+#if defined(HAVE_DBUS)
 
 int Keyboard::dbus_connect() 
 {
@@ -210,3 +227,5 @@ void Keyboard::dbus_disconnect()
         conn = NULL;
     }
 }
+
+#endif

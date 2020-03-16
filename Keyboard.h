@@ -11,7 +11,9 @@
   struct termios orig_termios;
   int orig_fl;
   int m_action;
+#if defined(HAVE_DBUS)
   DBusConnection *conn;
+#endif
   std::map<int,int> m_keymap;
   std::string m_dbus_name;
  public:
@@ -26,6 +28,8 @@
  private:
   void restore_term();
   void send_action(int action);
+#if defined(HAVE_DBUS)
   int dbus_connect();
   void dbus_disconnect();
+#endif
  };

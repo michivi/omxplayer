@@ -30,6 +30,7 @@ int convertStringToAction(string str_action)
         return KeyConfig::ACTION_PREVIOUS_CHAPTER;
     if(str_action == "NEXT_CHAPTER")
         return KeyConfig::ACTION_NEXT_CHAPTER;
+#if defined(HAVE_SUBTITLE)
     if(str_action == "PREVIOUS_SUBTITLE")
         return KeyConfig::ACTION_PREVIOUS_SUBTITLE;
     if(str_action == "NEXT_SUBTITLE")
@@ -40,6 +41,7 @@ int convertStringToAction(string str_action)
         return KeyConfig::ACTION_DECREASE_SUBTITLE_DELAY;
     if(str_action == "INCREASE_SUBTITLE_DELAY")
         return KeyConfig::ACTION_INCREASE_SUBTITLE_DELAY;
+#endif
     if(str_action == "EXIT")
         return KeyConfig::ACTION_EXIT;
     if(str_action == "PAUSE")
@@ -58,10 +60,12 @@ int convertStringToAction(string str_action)
         return KeyConfig::ACTION_SEEK_FORWARD_LARGE;
     if(str_action == "STEP")
         return KeyConfig::ACTION_STEP;
+#if defined(HAVE_SUBTITLE)
     if(str_action == "SHOW_SUBTITLES")
         return KeyConfig::ACTION_SHOW_SUBTITLES;
     if(str_action == "HIDE_SUBTITLES")
         return KeyConfig::ACTION_HIDE_SUBTITLES;
+#endif
             
     return -1;
 }
@@ -109,11 +113,13 @@ map<int, int> KeyConfig::buildDefaultKeymap()
     keymap['k'] = ACTION_NEXT_AUDIO;
     keymap['i'] = ACTION_PREVIOUS_CHAPTER;
     keymap['o'] = ACTION_NEXT_CHAPTER;
+#if defined(HAVE_SUBTITLE)
     keymap['n'] = ACTION_PREVIOUS_SUBTITLE;
     keymap['m'] = ACTION_NEXT_SUBTITLE;
     keymap['s'] = ACTION_TOGGLE_SUBTITLE;
     keymap['d'] = ACTION_DECREASE_SUBTITLE_DELAY;
     keymap['f'] = ACTION_INCREASE_SUBTITLE_DELAY;
+#endif
     keymap['q'] = ACTION_EXIT;
     keymap[KEY_ESC] = ACTION_EXIT;
     keymap['p'] = ACTION_PLAYPAUSE;
@@ -126,8 +132,10 @@ map<int, int> KeyConfig::buildDefaultKeymap()
     keymap[KEY_DOWN] = ACTION_SEEK_BACK_LARGE;
     keymap[KEY_UP] = ACTION_SEEK_FORWARD_LARGE;
     keymap['v'] = ACTION_STEP;
+#if defined(HAVE_SUBTITLE)
     keymap['w'] = ACTION_SHOW_SUBTITLES;
     keymap['x'] = ACTION_HIDE_SUBTITLES;
+#endif
 
     return keymap;
 }

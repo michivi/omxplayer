@@ -3,7 +3,9 @@
 #include <stdint.h>
 #include <sys/mman.h>
 #include <string.h>
+#if defined(HAVE_DBUS)
 #include <dbus/dbus.h>
+#endif
 
 #include <string>
 #include <sstream>
@@ -89,7 +91,9 @@ OMXControl::OMXControl()
 
 OMXControl::~OMXControl() 
 {
+#if defined(HAVE_DBUS)
     dbus_disconnect();
+#endif
 }
 
 int OMXControl::init(OMXClock *m_av_clock, OMXPlayerAudio *m_player_audio, OMXPlayerSubtitles *m_player_subtitles, OMXReader *m_omx_reader, std::string& dbus_name)
@@ -100,6 +104,7 @@ int OMXControl::init(OMXClock *m_av_clock, OMXPlayerAudio *m_player_audio, OMXPl
   subtitles = m_player_subtitles;
   reader    = m_omx_reader;
 
+  #if defined(HAVE_DBUS)
   if (dbus_connect(dbus_name) < 0)
   {
     CLog::Log(LOGWARNING, "DBus connection failed, trying alternate");
@@ -123,15 +128,19 @@ int OMXControl::init(OMXClock *m_av_clock, OMXPlayerAudio *m_player_audio, OMXPl
     CLog::Log(LOGDEBUG, "DBus connection succeeded");
     dbus_threads_init_default();
   }
+  #endif
   return ret;
 }
 
 void OMXControl::dispatch()
 {
+  #if defined(HAVE_DBUS)
   if (bus)
     dbus_connection_read_write(bus, 0);
+  #endif
 }
 
+#if defined(HAVE_DBUS)
 int OMXControl::dbus_connect(std::string& dbus_name)
 {
   DBusError error;
@@ -186,9 +195,11 @@ void OMXControl::dbus_disconnect()
         bus = NULL;
     }
 }
+#endif
 
 OMXControlResult OMXControl::getEvent()
 {
+#if defined(HAVE_DBUS)
   if (!bus)
     return KeyConfig::ACTION_BLANK;
 
@@ -203,7 +214,12 @@ OMXControlResult OMXControl::getEvent()
   dbus_message_unref(m);
 
   return result;
+#else
+  return KeyConfig::ACTION_BLANK;
+#endif
 }
+
+#if defined(HAVE_DBUS)
 
 OMXControlResult OMXControl::handle_event(DBusMessage *m)
 {
@@ -1300,3 +1316,5 @@ DBusHandlerResult OMXControl::dbus_respond_array(DBusMessage *m, const char *arr
 
   return DBUS_HANDLER_RESULT_HANDLED;
 }
+
+#endif

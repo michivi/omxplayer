@@ -43,18 +43,43 @@ AC_CONFIG_FILES([Makefile version.h])
 AC_PROG_CXX()
 AC_PATH_PROG(STRIP, [strip])
 
-AC_CHECK_HEADER([bcm_host.h], [], [AC_MSG_ERROR([Missing bcm_host.h header file. Please make you you've installed the Raspberry Pi userland tools.])])
-
-AC_ARG_ENABLE([alsa],
-    AS_HELP_STRING([--disable-alsa], [Disable alsa sound support]))
-AS_IF([test "x$enable_alsa" != "xno"], [
-    AC_CHECK_HEADER([alsa/asoundlib.h], [], [AC_MSG_ERROR([Cannot find alsa/asoundlib.h.])])
-    AC_SEARCH_LIBS([snd_pcm_open], [asound], [], [AC_MSG_ERROR([Cannot find the asound library.])])
-])
+NeedAlsa=NO
+NeedDbus=NO
+NeedFreeType=NO
+NeedPcre=YES
 
 AC_ARG_ENABLE([dbus],
     AS_HELP_STRING([--disable-dbus], [Disable DBus support]))
 AS_IF([test "x$enable_dbus" != "xno"], [
+    AC_DEFINE([HAVE_DBUS], [], [Define to indicate support for DBus.])
+    NeedDbus=YES
+])
+AM_CONDITIONAL([HAVE_DBUS], [test "$HAVE_DBUS" = "YES"])
+
+AC_ARG_ENABLE([sound],
+    AS_HELP_STRING([--disable-sound], [Disable sound support]))
+AS_IF([test "x$enable_sound" != "xno"], [
+    AC_DEFINE([HAVE_SOUND], [], [Define to indicate support for sound.])
+    NeedAlsa=YES
+])
+AM_CONDITIONAL([HAVE_SOUND], [test "$HAVE_SOUND" = "YES"])
+
+AC_ARG_ENABLE([subtitles],
+    AS_HELP_STRING([--disable-subtitles], [Disable subtitle support]))
+AS_IF([test "x$enable_subtitles" != "xno"], [
+    AC_DEFINE([HAVE_SUBTITLES], [], [Define to indicate support for subtitles.])
+    NeedFreeType=YES
+])
+AM_CONDITIONAL([HAVE_SUBTITLES], [test "$HAVE_SUBTITLES" = "YES"])
+
+AC_CHECK_HEADER([bcm_host.h], [], [AC_MSG_ERROR([Missing bcm_host.h header file. Please make you you've installed the Raspberry Pi userland tools.])])
+
+AS_IF([test "$NeedAlsa" = "YES"], [
+    AC_CHECK_HEADER([alsa/asoundlib.h], [], [AC_MSG_ERROR([Cannot find alsa/asoundlib.h.])])
+    AC_SEARCH_LIBS([snd_pcm_open], [asound], [], [AC_MSG_ERROR([Cannot find the asound library.])])
+])
+
+AS_IF([test "$NeedDbus" = "YES"], [
     AC_CHECK_HEADER([dbus/dbus.h], [], [AC_MSG_ERROR([Cannot find dbus/dbus.h.])])
     AC_SEARCH_LIBS([dbus_bus_request_name], [dbus-1], [], [AC_MSG_ERROR([Cannot find the dbus library.])])
 ])
@@ -89,9 +114,13 @@ AC_CHECK_HEADERS([libavutil/avutil.h libavutil/opt.h libavutil/mem.h]
                 )
 AC_SEARCH_LIBS([av_d2q], [avutil], [], [AC_MSG_ERROR([Cannot find the libavutil library.])])
 
-AC_SEARCH_LIBS([pcre_compile], [pcre], [], [AC_MSG_ERROR([Cannot find the pcre library.])])
+AS_IF([test "$NeedPcre" = "YES"], [
+    AC_SEARCH_LIBS([pcre_compile], [pcre], [], [AC_MSG_ERROR([Cannot find the pcre library.])])
+])
 
-AC_SEARCH_LIBS([FT_Stroker_New], [freetype], [], [AC_MSG_ERROR([Cannot find the freetype library.])])
+AS_IF([test "$NeedFreeType" = "YES"], [
+    AC_SEARCH_LIBS([FT_Stroker_New], [freetype], [], [AC_MSG_ERROR([Cannot find the freetype library.])])
+])
 
 LIBS="$LIBS -lEGL -lbcm_host -lvchostif -lvchiq_arm"
 

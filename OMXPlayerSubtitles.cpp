@@ -18,7 +18,9 @@
 
 #include "OMXPlayerSubtitles.h"
 #include "OMXOverlayText.h"
+#if defined(HAVE_SUBTITLES)
 #include "SubtitleRenderer.h"
+#endif
 #include "utils/Enforce.h"
 #include "utils/ScopeExit.h"
 #include "utils/Clamp.h"
@@ -152,6 +154,7 @@ RenderLoop(const string& font_path,
            unsigned int lines,
            OMXClock* clock)
 {
+  #if defined(HAVE_SUBTITLES)
   SubtitleRenderer renderer(m_display, m_layer,
                             font_path,
                             italic_font_path,
@@ -161,6 +164,7 @@ RenderLoop(const string& font_path,
                             0xDD,
                             ghost_box ? 0x80 : 0,
                             lines);
+  #endif
 
   vector<Subtitle> subtitles;
 
@@ -186,7 +190,9 @@ RenderLoop(const string& font_path,
     {
       if(subtitles[next_index].stop > time)
       {
+        #if defined(HAVE_SUBTITLES)
         renderer.prepare(subtitles[next_index].text_lines);
+        #endif
         have_next = true;
         break;
       }
@@ -195,7 +201,9 @@ RenderLoop(const string& font_path,
 
   auto Reset = [&](int time)
   {
+    #if defined(HAVE_SUBTITLES)
     renderer.unprepare();
+    #endif
     current_stop = INT_MIN;
 
     auto it = FindSubtitle(subtitles.begin(),
@@ -205,7 +213,9 @@ RenderLoop(const string& font_path,
 
     if(next_index != subtitles.size())
     {
+      #if defined(HAVE_SUBTITLES)
       renderer.prepare(subtitles[next_index].text_lines);
+      #endif
       have_next = true;
     }
     else
@@ -268,8 +278,10 @@ RenderLoop(const string& font_path,
       },
       [&](Message::DisplayText&& args)
       {
+        #if defined(HAVE_SUBTITLES)
         renderer.prepare(args.text_lines);
         renderer.show_next();
+        #endif
         showing = true;
         osd = true;
         osd_stop = chrono::steady_clock::now() +
@@ -278,7 +290,9 @@ RenderLoop(const string& font_path,
       },
       [&](Message::SetRect&& args)
       {
+        #if defined(HAVE_SUBTITLES)
         renderer.set_rect(args.x1, args.y1, args.x2, args.y2);
+        #endif
       });
 
     if(exit) break;
@@ -303,7 +317,9 @@ RenderLoop(const string& font_path,
     {
       if(have_next && subtitles[next_index].start <= now)
       {
+        #if defined(HAVE_SUBTITLES)
         renderer.show_next();
+        #endif
         // printf("show error: %i ms\n", now - subtitles[next_index].start);
         showing = true;
         current_stop = subtitles[next_index].stop;
@@ -314,7 +330,9 @@ RenderLoop(const string& font_path,
       }
       else if(showing)
       {
+        #if defined(HAVE_SUBTITLES)
         renderer.hide();
+        #endif
         // printf("hide error: %i ms\n", now - current_stop);
         showing = false;
       }

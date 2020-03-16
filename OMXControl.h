@@ -2,7 +2,9 @@
 #define OMXPLAYER_DBUS_INTERFACE_ROOT "org.mpris.MediaPlayer2"
 #define OMXPLAYER_DBUS_INTERFACE_PLAYER "org.mpris.MediaPlayer2.Player"
 
+#if defined(HAVE_DBUS)
 #include <dbus/dbus.h>
+#endif
 #include "OMXClock.h"
 #include "OMXPlayerAudio.h"
 #include "OMXPlayerSubtitles.h"
@@ -29,7 +31,9 @@ public:
 class OMXControl
 {
 protected:
+#if defined(HAVE_DBUS)
   DBusConnection     *bus;
+#endif
   OMXClock           *clock;
   OMXPlayerAudio     *audio;
   OMXReader          *reader;
@@ -40,6 +44,7 @@ public:
   int init(OMXClock *m_av_clock, OMXPlayerAudio *m_player_audio, OMXPlayerSubtitles *m_player_subtitles, OMXReader *m_omx_reader, std::string& dbus_name);
   OMXControlResult getEvent();
   void dispatch();
+#if defined(HAVE_DBUS)
 private:
   int dbus_connect(std::string& dbus_name);
   void dbus_disconnect();
@@ -51,4 +56,5 @@ private:
   DBusHandlerResult dbus_respond_boolean(DBusMessage *m, int b);
   DBusHandlerResult dbus_respond_string(DBusMessage *m, const char *text);
   DBusHandlerResult dbus_respond_array(DBusMessage *m, const char *array[], int size);
+#endif
 };
